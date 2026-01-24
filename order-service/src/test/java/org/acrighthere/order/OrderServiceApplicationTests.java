@@ -1,6 +1,7 @@
 package org.acrighthere.order;
 
 import io.restassured.RestAssured;
+import org.acrighthere.order.stubs.InventoryClientStub;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,9 +12,12 @@ import org.springframework.context.annotation.Import;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.mysql.MySQLContainer;
+import org.wiremock.spring.ConfigureWireMock;
+import org.wiremock.spring.EnableWireMock;
 
 @Import(TestcontainersConfiguration.class)
 @SpringBootTest(webEnvironment =  SpringBootTest.WebEnvironment.RANDOM_PORT)
+@EnableWireMock
 @Testcontainers
 class OrderServiceApplicationTests {
     @Container
@@ -37,6 +41,7 @@ class OrderServiceApplicationTests {
                     "quantity":1
                 }
                 """;
+        InventoryClientStub.stubInventoryCall("iphone_15", 1);
         RestAssured.given()
                 .contentType("application/json")
                 .body(requestBody)
