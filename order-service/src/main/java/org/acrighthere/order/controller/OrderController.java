@@ -2,6 +2,7 @@ package org.acrighthere.order.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.acrighthere.order.dto.OrderRequest;
+import org.acrighthere.order.dto.OrderResponse;
 import org.acrighthere.order.service.OrderService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -14,9 +15,8 @@ public class OrderController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public String placeOrder(@RequestBody OrderRequest orderRequest)
+    public OrderResponse placeOrder(@RequestBody OrderRequest orderRequest)
     {
-        orderService.placeOrder(orderRequest);
-        return "Order Placed Successfully";
+        return orderService.placeOrder(orderRequest);
     }
 }
