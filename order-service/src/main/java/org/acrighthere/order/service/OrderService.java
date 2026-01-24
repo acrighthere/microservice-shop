@@ -3,6 +3,7 @@ package org.acrighthere.order.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.acrighthere.order.client.InventoryClient;
 import org.acrighthere.order.dto.OrderRequest;
 import org.acrighthere.order.dto.OrderResponse;
 import org.acrighthere.order.model.Order;
@@ -16,14 +17,22 @@ import java.util.UUID;
 @Slf4j
 public class OrderService {
     private final OrderRepository orderRepository;
+    private final InventoryClient inventoryClient;
     public OrderResponse placeOrder(OrderRequest orderRequest){
-        Order order = new Order();
-        order.setOrderNumber(UUID.randomUUID().toString());
-        order.setPrice(orderRequest.price());
-        order.setQuantity(orderRequest.quantity());
-        order.setSkuCode(orderRequest.skuCode());
-        log.info("Order {} has been placed", order.getOrderNumber());
-        orderRepository.save(order);
-        return new OrderResponse(order.getId(),order.getOrderNumber(),order.getSkuCode(),order.getPrice(),order.getQuantity());
+        boolean isProductInStock = inventoryClient.isInStock(orderRequest.skuCode(),orderRequest.quantity());
+
+        if (isProductInStock){
+            Order order = new Order();
+            order.setOrderNumber(UUID.randomUUID().toString());
+            order.setPrice(orderRequest.price());
+            order.setQuantity(orderRequest.quantity());
+            order.setSkuCode(orderRequest.skuCode());
+            log.info("Order {} has been placed", order.getOrderNumber());
+            orderRepository.save(order);
+            return new OrderResponse(order.getId(),order.getOrderNumber(),order.getSkuCode(),order.getPrice(),order.getQuantity());
+        } else {
+            throw new RuntimeException("Product with skuCode "+orderRequest.skuCode()+" is not in stock");
+        }
+
     }
 }
