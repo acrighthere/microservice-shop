@@ -6,8 +6,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.acrighthere.order.client.InventoryClient;
 import org.acrighthere.order.dto.OrderRequest;
 import org.acrighthere.order.dto.OrderResponse;
+import org.acrighthere.order.event.OrderPlacedEvent;
 import org.acrighthere.order.model.Order;
 import org.acrighthere.order.repository.OrderRepository;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -18,6 +20,7 @@ import java.util.UUID;
 public class OrderService {
     private final OrderRepository orderRepository;
     private final InventoryClient inventoryClient;
+    private final KafkaTemplate<String,OrderPlacedEvent> kafkaTemplate;
     public OrderResponse placeOrder(OrderRequest orderRequest){
         boolean isProductInStock = inventoryClient.isInStock(orderRequest.skuCode(),orderRequest.quantity());
 
@@ -29,6 +32,10 @@ public class OrderService {
             order.setSkuCode(orderRequest.skuCode());
             log.info("Order {} has been placed", order.getOrderNumber());
             orderRepository.save(order);
+            OrderPlacedEvent orderPlacedEvent = new OrderPlacedEvent(order.getOrderNumber(),orderRequest.userDetails().email());
+            log.info("Start sending OrderPlacedEvent {} to Kafka topic order-placed", orderPlacedEvent);
+            kafkaTemplate.send("order-placed",orderPlacedEvent);
+            log.info("End sending OrderPlacedEvent {} to Kafka topic order-placed", orderPlacedEvent);
             return new OrderResponse(order.getId(),order.getOrderNumber(),order.getSkuCode(),order.getPrice(),order.getQuantity());
         } else {
             throw new RuntimeException("Product with skuCode "+orderRequest.skuCode()+" is not in stock");
