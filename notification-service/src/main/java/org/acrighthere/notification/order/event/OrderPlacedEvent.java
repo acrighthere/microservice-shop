@@ -1,4 +1,4 @@
-package org.acrighthere.order.event;
+package org.acrighthere.notification.order.event;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,4 +11,3 @@ public class OrderPlacedEvent {
     private String orderNumber;
     private String email;
 }
-
