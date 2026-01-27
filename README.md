@@ -25,7 +25,7 @@ The technologies used in this project are:
 
 
 ## Application Architecture
-![image](https://github.com/user-attachments/assets/d4ef38bd-8ae5-4cc7-9ac5-7a8e5ec3c969)
+![image](img.png)
 
 ## How to run the frontend application
 
