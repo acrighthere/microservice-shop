@@ -15,4 +15,5 @@ Home Page
 Add Product page
 
 ![img_1.png](screenshots/img_1.png)
+If you are seriously want to run this app and have issues with configuration of keycloak text me in Telegram(link in bio)
 
